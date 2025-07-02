@@ -1,29 +1,166 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="theme-color" content="#000000">
-  <script type="text/javascript" src="script.js"></script>
+  <meta charset="UTF-8">
   <title>日直日誌</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #444;
+      padding: 8px;
+      text-align: center;
+    }
+    input[type="text"] {
+      width: 90%;
+      padding: 4px;
+    }
+    h1, h2 {
+      margin-top: 40px;
+    }
+  </style>
 </head>
 <body>
-
-<div style="border: solid 3px #000; width: 600px; margin: 5em; border: solid 3px #000000;"></div>
-  <p style="color:black">
-
-  
-    <h1>学年スローガン：動孝知覚～動こうともかく～</h1>
-
-    <h2>日替わりスローガン：<label><input type="text" size="50" ></label></h2>
-
-    <h3></h3>
  
-  </p>
-
-</div>
+  <h1>日直日誌
+    <label class="hiduke" for="date">    : <input class="hiduke"  type="date" id="date" name="date"><br><br>
+ </label><br>
+   
+ 
+  </h1>
+ 
+  <div id="slogan-table-container"></div>
+ 
+  <h2>☆HR後の4S確認（良ければ〇）</h2>
+  <div id="checklist-table-container"></div>
+ 
+  <h3>日直コメント：</h3>
+  <div id="memo-table-container"></div>
+ 
+ 
+ 
+ 
+  <script>
+    // スローガンデータ
+    const data = [
+      ["学年スローガン", "動考知覚～動こうともかく"],
+      ["日替わりスローガン", ""]
+    ];
+ 
+    // スローガン用テーブル作成
+    const table = document.createElement("table");
+ 
+    data.forEach(rowData => {
+      const row = document.createElement("tr");
+ 
+      rowData.forEach((cellData, colIndex) => {
+        const cell = document.createElement(colIndex === 0 ? "th" : "td");
+ 
+        if (colIndex === 1) {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.value = cellData;
+          input.placeholder = "ここに入力";
+          cell.appendChild(input);
+        } else {
+          cell.textContent = cellData;
+        }
+ 
+        row.appendChild(cell);
+      });
+ 
+      table.appendChild(row);
+    });
+ 
+    document.getElementById("slogan-table-container").appendChild(table);
+  </script>
+ 
+  <script>
+    // HR後の4S確認チェックリストHTML
+    const tableHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>ホワイトボード</th>
+            <th>ボード清掃</th>
+             <th>　　</th>
+            <th>ペン</th>
+             <th>　　</th>
+            <th>掲示物</th>
+             <th>　　</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>床・窓・ブラインド</th>
+            <td>床面</td>
+             <th>　　</th>
+            <td>窓施錠</td>
+             <th>　　</th>
+            <td>ブラインド降ろし</td>
+             <th>　　</th>
+          </tr>
+          <tr>
+            <th>机・イス</th>
+            <td>並び</td>
+             <th>　　</th>
+            <td>引出し忘れ物</td>
+             <th>　　</th>
+            <td>ゴミ不要物</td>
+             <th>　　</th>
+          </tr>
+          <tr>
+            <th>ハンガーロッカー</th>
+            <td>ゴミ不要物</td>
+             <th>　　</th>
+            <td>ロッカー忘れ物</td>
+             <th>　　</th>
+            <td>ハンガー整列</td>
+             <th>　　</th>
+          </tr>
+          <tr>
+            <th>教室</th>
+            <td>エアコンOFF</td>
+             <th>　　</th>
+            <td>消灯</td>
+             <th>　　</th>
+            <td>清掃用具</td>
+             <th>　　</th>
+          </tr>
+        </tbody>
+      </table>
+ 
+     
+    `;
+ 
+      document.getElementById("checklist-table-container").innerHTML = tableHTML;
+      </script>
+ 
+   
+ 
+ 
+ 
+    <textarea id="content" name="content" rows="10" cols="50" placeholder="今日一日のふりかえり"></textarea><br><br>
+     <h3>担任コメント：</h3>
+  <div id="memo-table-container"></div>
+    <textarea id="cont" name="cont" rows="10" cols="50" placeholder="なんでも"></textarea><br><br>
+   
+  </table>
+ 
+ 
+ 
+ 
+ 
+ 
 </body>
-
 </html>
+ 
+ 
+ 

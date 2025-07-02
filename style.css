@@ -1,6 +1,13 @@
 .スローガン {
 
-    width: 800px;
-    height: 150px;
-    border-style:  "2px solid black";
-}
+    border-collapse: collapse;
+
+  }
+  th, td {
+    border: 3px solid black;
+    padding: 8px;
+  }
+
+  .hiduke {
+    display: flex;
+  }
