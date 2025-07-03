@@ -1,166 +1,294 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>日直日誌</title>
   <style>
     body {
-      font-family: sans-serif;
-      padding: 20px;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f0f4f8;
+      padding: 40px;
+      color: #333;
     }
-    table {
-      border-collapse: collapse;
+ 
+    h1, h2, h3 {
+      color: #2c3e50;
+      margin-bottom: 12px;
+    }
+ 
+    #nissi {
+      font-size: 48px;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+ 
+    #hiduke {
+      padding-top: 10px;
+      font-size: 18px;
+    }
+ 
+    input[type="date"],
+    select,
+    input[type="text"],
+    textarea {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
       width: 100%;
-      margin-top: 20px;
+      max-width: 100%;
     }
+ 
+    table {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+      margin-top: 30px;
+      background-color: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+ 
     th, td {
-      border: 1px solid #444;
-      padding: 8px;
+      padding: 16px;
       text-align: center;
+      border-bottom: 1px solid #eee;
+      font-size: 16px;
     }
-    input[type="text"] {
-      width: 90%;
-      padding: 4px;
+ 
+    th {
+      background-color: #eaf2fb;
+      font-weight: bold;
     }
-    h1, h2 {
+ 
+    .oya {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+ 
+    .oya2 {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
       margin-top: 40px;
+    }
+ 
+    h3 {
+      font-size: 20px;
+      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+    }
+ 
+    #content, #cont {
+      width: 100%;
+      height: 150px;
+      resize: none;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      padding: 12px;
+    }
+ 
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 8px;
+      margin-right: 12px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+ 
+    button:hover {
+      background-color: #2980b9;
+    }
+ 
+    .check4S {
+      width: 60px;
+      height: 40px;
+      font-size: 20px;
+      border-radius: 8px;
+      background-color: #ecf0f1;
+      color: #2c3e50;
+      transition: background-color 0.2s ease;
+      border: none;
+    }
+ 
+    .check4S:hover {
+      background-color: #dfe6e9;
     }
   </style>
 </head>
 <body>
  
-  <h1>日直日誌
-    <label class="hiduke" for="date">    : <input class="hiduke"  type="date" id="date" name="date"><br><br>
- </label><br>
-   
+<div class="oya">
+  <div id="nissi">日直日誌</div>
+  <div id="hiduke">日付 <input type="date" id="date" name="date"></div>
+</div>
  
-  </h1>
+<table>
+  <thead>
+    <tr><th>期</th><th>クラス</th><th>日直</th><th>副日直</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <select class="check4S" id="kiSelect">
+          <option value=""> </option>
+          <option value="1">36</option>
+          <option value="2">78</option>
+          <option value="3">79</option>
+          <option value="4">80</option>
+        </select>
+      </td>
+      <td>
+        <select class="check4S" id="classSelect">
+          <option value=""> </option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+        </select>
+      </td>
+      <td><input type="text" id="nichoku"></td>
+      <td><input type="text" id="fukunichoku"></td>
+    </tr>
+  </tbody>
+</table>
  
-  <div id="slogan-table-container"></div>
+<div id="slogan-table-container"></div>
  
-  <h2>☆HR後の4S確認（良ければ〇）</h2>
-  <div id="checklist-table-container"></div>
- 
-  <h3>日直コメント：</h3>
-  <div id="memo-table-container"></div>
- 
- 
- 
- 
-  <script>
-    // スローガンデータ
-    const data = [
-      ["学年スローガン", "動考知覚～動こうともかく"],
-      ["日替わりスローガン", ""]
-    ];
- 
-    // スローガン用テーブル作成
-    const table = document.createElement("table");
- 
-    data.forEach(rowData => {
-      const row = document.createElement("tr");
- 
-      rowData.forEach((cellData, colIndex) => {
-        const cell = document.createElement(colIndex === 0 ? "th" : "td");
- 
-        if (colIndex === 1) {
-          const input = document.createElement("input");
-          input.type = "text";
-          input.value = cellData;
-          input.placeholder = "ここに入力";
-          cell.appendChild(input);
-        } else {
-          cell.textContent = cellData;
-        }
- 
-        row.appendChild(cell);
-      });
- 
-      table.appendChild(row);
-    });
- 
-    document.getElementById("slogan-table-container").appendChild(table);
-  </script>
- 
-  <script>
-    // HR後の4S確認チェックリストHTML
-    const tableHTML = `
-      <table>
-        <thead>
-          <tr>
-            <th>ホワイトボード</th>
-            <th>ボード清掃</th>
-             <th>　　</th>
-            <th>ペン</th>
-             <th>　　</th>
-            <th>掲示物</th>
-             <th>　　</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th>床・窓・ブラインド</th>
-            <td>床面</td>
-             <th>　　</th>
-            <td>窓施錠</td>
-             <th>　　</th>
-            <td>ブラインド降ろし</td>
-             <th>　　</th>
-          </tr>
-          <tr>
-            <th>机・イス</th>
-            <td>並び</td>
-             <th>　　</th>
-            <td>引出し忘れ物</td>
-             <th>　　</th>
-            <td>ゴミ不要物</td>
-             <th>　　</th>
-          </tr>
-          <tr>
-            <th>ハンガーロッカー</th>
-            <td>ゴミ不要物</td>
-             <th>　　</th>
-            <td>ロッカー忘れ物</td>
-             <th>　　</th>
-            <td>ハンガー整列</td>
-             <th>　　</th>
-          </tr>
-          <tr>
-            <th>教室</th>
-            <td>エアコンOFF</td>
-             <th>　　</th>
-            <td>消灯</td>
-             <th>　　</th>
-            <td>清掃用具</td>
-             <th>　　</th>
-          </tr>
-        </tbody>
-      </table>
- 
-     
-    `;
- 
-      document.getElementById("checklist-table-container").innerHTML = tableHTML;
-      </script>
- 
-   
- 
- 
- 
-    <textarea id="content" name="content" rows="10" cols="50" placeholder="今日一日のふりかえり"></textarea><br><br>
-     <h3>担任コメント：</h3>
-  <div id="memo-table-container"></div>
-    <textarea id="cont" name="cont" rows="10" cols="50" placeholder="なんでも"></textarea><br><br>
-   
+<h2>☆HR後の4S確認（良ければ〇）</h2>
+<div id="memo-table-container">
+  <table>
+    <tbody>
+      <tr><th>ホワイトボード</th><td>ボード清掃</td><th><select class="check4S"></select></th><td>ペン</td><th><select class="check4S"></select></th><td>掲示物</td><th><select class="check4S"></select></th></tr>
+      <tr><th>床・窓・ブラインド</th><td>床面</td><th><select class="check4S"></select></th><td>窓施錠</td><th><select class="check4S"></select></th><td>ブラインド降ろし</td><th><select class="check4S"></select></th></tr>
+      <tr><th>机・イス</th><td>並び</td><th><select class="check4S"></select></th><td>引出し忘れ物</td><th><select class="check4S"></select></th><td>ゴミ不要物</td><th><select class="check4S"></select></th></tr>
+      <tr><th>ハンガーロッカー</th><td>ゴミ不要物</td><th><select class="check4S"></select></th><td>ロッカー忘れ物</td><th><select class="check4S"></select></th><td>ハンガー整列</td><th><select class="check4S"></select></th></tr>
+      <tr><th>教室</th><td>エアコンOFF</td><th><select class="check4S"></select></th><td>消灯</td><th><select class="check4S"></select></th><td>清掃用具</td><th><select class="check4S"></select></th></tr>
+    </tbody>
   </table>
+</div>
  
+<div class="oya2">
+  <div>
+    <h3>日直コメント：</h3>
+    <textarea id="content" name="content" placeholder="今日一日のふりかえり"></textarea>
+  </div>
+  <div>
+    <h3>担任コメント：</h3>
+    <textarea id="cont" name="cont" placeholder="コメント"></textarea>
+  </div>
+</div>
  
+<button onclick="saveData()">保存</button>
+<a href="history.html"><button>履歴を見る</button></a>
  
+<script>
+  const slogans = {
+    "1": "36期スローガン：未来を拓け！",
+    "2": "動考知覚～動こう、ともかく～",
+    "3": "目標を持って走りだせ！",
+    "4": "スタートラインに立つ"
+  };
  
+  const toggleStates = ["", "〇", "×"];
+  document.querySelectorAll(".check4S").forEach((sel, index) => {
+    if (sel.tagName === "SELECT" && sel.id !== "kiSelect" && sel.id !== "classSelect") {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "check4S";
+      btn.dataset.index = index;
+      btn.textContent = "";
+      btn.addEventListener("click", () => {
+        const current = btn.textContent;
+        const nextIndex = (toggleStates.indexOf(current) + 1) % toggleStates.length;
+        btn.textContent = toggleStates[nextIndex];
+        btn.style.backgroundColor = btn.textContent === "〇" ? "#a5d6a7" :
+                                    btn.textContent === "×" ? "#ef9a9a" : "#ecf0f1";
+      });
+      sel.replaceWith(btn);
+    }
+  });
  
+  document.getElementById("kiSelect").addEventListener("change", function () {
+    const value = this.value;
+    document.getElementById("gakunenSlogan").value = slogans[value] || "";
+  });
  
+  const sloganTable = document.createElement("table");
+  const data = [["学年スローガン", ""], ["日替わりスローガン", ""]];
+  data.forEach((rowData, i) => {
+    const row = document.createElement("tr");
+    rowData.forEach((cellData, colIndex) => {
+      const cell = document.createElement(colIndex === 0 ? "th" : "td");
+      if (colIndex === 1) {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = "ここに入力";
+        input.id = i === 0 ? "gakunenSlogan" : "dailySlogan";
+        input.readOnly = i === 0;
+        cell.appendChild(input);
+      } else {
+        cell.textContent = cellData;
+      }
+      row.appendChild(cell);
+    });
+    sloganTable.appendChild(row);
+  });
+  document.getElementById("slogan-table-container").appendChild(sloganTable);
+ 
+  function saveData() {
+    const ki = document.getElementById("kiSelect").value;
+    const classSelect = document.getElementById("classSelect").value;
+    const date = document.getElementById("date").value;
+    const nichoku = document.getElementById("nichoku").value.trim();
+    const fukunichoku = document.getElementById("fukunichoku").value.trim();
+    const gakunenSlogan = document.getElementById("gakunenSlogan").value.trim();
+    const dailySlogan = document.getElementById("dailySlogan").value.trim();
+    const nichokuComment = document.getElementById("content").value.trim();
+ 
+    if (!ki || !classSelect || !date || !nichoku || !fukunichoku || !gakunenSlogan || !dailySlogan || !nichokuComment) {
+      alert("日付・期・クラス・日直・副日直・スローガン・日直コメントはすべて入力してください！");
+      return;
+    }
+ 
+    const checkButtons = document.querySelectorAll("#memo-table-container .check4S");
+    const checkValues = Array.from(checkButtons).map(btn => btn.textContent);
+ 
+    const data = {
+      date,
+      ki,
+      classSelect,
+      nichoku,
+      fukunichoku,
+      gakunenSlogan,
+      dailySlogan,
+      nichokuComment,
+      tanninComment: document.getElementById("cont").value,
+      checkValues
+    };
+ 
+    const key = `nissiHistory-${ki}-${classSelect}`;
+    const history = JSON.parse(localStorage.getItem(key) || "[]");
+    history.push(data);
+    localStorage.setItem(key, JSON.stringify(history));
+    alert("保存しました！");
+  }
+</script>
 </body>
 </html>
- 
  
  

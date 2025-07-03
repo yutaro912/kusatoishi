@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>日直日誌の履歴</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      padding: 40px;
+      background: #f0f4f8;
+      color: #333;
+    }
+ 
+    h1 {
+      font-size: 32px;
+      margin-bottom: 24px;
+      color: #2c3e50;
+    }
+ 
+    .buttons {
+      margin-bottom: 30px;
+    }
+ 
+    select, input[type="date"] {
+      padding: 10px;
+      font-size: 16px;
+      margin-right: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+ 
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 8px;
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+    }
+ 
+    button:hover {
+      background-color: #2980b9;
+    }
+ 
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+      transition: transform 0.2s ease;
+    }
+ 
+    .card:hover {
+      transform: translateY(-4px);
+    }
+ 
+    .checkbox-label {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+ 
+    input[type="checkbox"] {
+      transform: scale(1.3);
+      margin-top: 6px;
+    }
+ 
+    .info-line {
+      font-size: 16px;
+      margin: 6px 0;
+    }
+ 
+    .highlight {
+      font-weight: bold;
+      color: #2980b9;
+    }
+ 
+    summary {
+      cursor: pointer;
+      color: #555;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+ 
+    details {
+      margin-top: 10px;
+    }
+ 
+    .comment-block {
+      margin: 10px 0;
+    }
+ 
+    ul.checklist {
+      padding-left: 20px;
+      margin-top: 10px;
+    }
+ 
+    ul.checklist li {
+      list-style-type: square;
+      margin-bottom: 4px;
+    }
+ 
+    .empty {
+      color: #888;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h1>日直日誌の履歴</h1>
+ 
+  <div class="buttons">
+    <a href="index.html"><button>← 戻る</button></a>
+ 
+    <label>期:
+      <select id="searchKi">
+        <option value="">すべて</option>
+        <option value="1">36</option>
+        <option value="2">78</option>
+        <option value="3">79</option>
+        <option value="4">80</option>
+      </select>
+    </label>
+ 
+    <label>クラス:
+      <select id="searchClass">
+        <option value="">すべて</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+      </select>
+    </label>
+ 
+    <input type="date" id="searchDate" />
+    <button onclick="filterHistory()">検索</button>
+    <button onclick="clearSearch()">検索解除</button>
+    <button onclick="deleteSelected()">選択した履歴を削除</button>
+  </div>
+ 
+  <div id="historyContainer"></div>
+ 
+  <script>
+    const checkItemNames = [
+      "ボード清掃", "ペン", "掲示物",
+      "床面", "窓施錠", "ブラインド降ろし",
+      "並び", "引出し忘れ物", "ゴミ不要物",
+      "ゴミ不要物（ロッカー）", "ロッカー忘れ物", "ハンガー整列",
+      "エアコンOFF", "消灯", "清掃用具"
+    ];
+ 
+    const kiLabelMap = {
+      "1": "36", "2": "78", "3": "79", "4": "80"
+    };
+ 
+    let fullHistory = [];
+ 
+    function loadAllHistories() {
+      fullHistory = [];
+ 
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith("nissiHistory-")) {
+          const historyArray = JSON.parse(localStorage.getItem(key) || "[]");
+          if (Array.isArray(historyArray)) {
+            fullHistory = fullHistory.concat(historyArray.map(item => ({ ...item, storageKey: key })));
+          }
+        }
+      }
+ 
+      fullHistory.sort((a, b) => b.date.localeCompare(a.date));
+      showHistory();
+    }
+ 
+    function showHistory(data = null) {
+      const history = data || fullHistory;
+      const container = document.getElementById("historyContainer");
+      container.innerHTML = "";
+ 
+      if (history.length === 0) {
+        container.innerHTML = "<p class='empty'>履歴はありません。</p>";
+        return;
+      }
+ 
+      history.forEach((item, index) => {
+        const kiLabel = kiLabelMap[item.ki] || item.ki;
+        const div = document.createElement("div");
+        div.className = "card";
+ 
+        div.innerHTML = `
+          <label class="checkbox-label">
+            <input type="checkbox" class="delete-checkbox" data-index="${index}">
+            <div>
+              <div class="info-line"><strong>${item.date}</strong> / <span class="highlight">${kiLabel}期 ${item.classSelect}組</span></div>
+              <div class="info-line">日直: <span class="highlight">${item.nichoku}</span> / 副: ${item.fukunichoku}</div>
+              <div class="info-line">スローガン: ${item.gakunenSlogan}</div>
+              <div class="info-line">日替わり: ${item.dailySlogan}</div>
+ 
+              <details>
+                <summary>📒 コメントを見る</summary>
+                <div class="comment-block"><strong>日直コメント：</strong><br>${item.nichokuComment.replace(/\n/g, "<br>")}</div>
+                <div class="comment-block"><strong>担任コメント：</strong><br>${item.tanninComment.replace(/\n/g, "<br>")}</div>
+              </details>
+ 
+              <details>
+                <summary>✅ 4S確認内容を見る</summary>
+                <ul class="checklist">
+                  ${item.checkValues.map((val, i) => `
+                    <li>${checkItemNames[i] || `項目${i + 1}`}: ${val || "未入力"}</li>
+                  `).join("")}
+                </ul>
+              </details>
+            </div>
+          </label>
+        `;
+        container.appendChild(div);
+      });
+    }
+ 
+    function filterHistory() {
+      const ki = document.getElementById("searchKi").value;
+      const classSelect = document.getElementById("searchClass").value;
+      const date = document.getElementById("searchDate").value;
+ 
+      const filtered = fullHistory.filter(item => {
+        const matchKi = !ki || item.ki === ki;
+        const matchClass = !classSelect || item.classSelect === classSelect;
+        const matchDate = !date || item.date === date;
+        return matchKi && matchClass && matchDate;
+      });
+ 
+      showHistory(filtered);
+    }
+ 
+    function clearSearch() {
+      document.getElementById("searchKi").value = "";
+      document.getElementById("searchClass").value = "";
+      document.getElementById("searchDate").value = "";
+      showHistory();
+    }
+ 
+    function deleteSelected() {
+      const checkboxes = document.querySelectorAll('.delete-checkbox');
+      const selectedIndexes = Array.from(checkboxes)
+        .map((cb, i) => cb.checked ? i : -1)
+        .filter(i => i !== -1);
+ 
+      if (selectedIndexes.length === 0) {
+        alert("削除したい履歴を選んでください！");
+        return;
+      }
+ 
+      if (!confirm("選択した履歴を削除してもよいですか？")) return;
+ 
+      const groupedByKey = {};
+      selectedIndexes.forEach(index => {
+        const item = fullHistory[index];
+        if (!groupedByKey[item.storageKey]) {
+          groupedByKey[item.storageKey] = [];
+        }
+        groupedByKey[item.storageKey].push(item);
+      });
+ 
+      for (const key in groupedByKey) {
+        let historyArray = JSON.parse(localStorage.getItem(key) || "[]");
+        const itemsToRemove = groupedByKey[key];
+ 
+        itemsToRemove.forEach(item => {
+          historyArray = historyArray.filter(h => h.date !== item.date || h.nichoku !== item.nichoku);
+        });
+ 
+        localStorage.setItem(key, JSON.stringify(historyArray));
+      }
+ 
+      alert("選択した履歴を削除しました。");
+      loadAllHistories();
+    }
+ 
+    window.onload = loadAllHistories;
+  </script>
+</body>
+</html>
+ 
+ 
